@@ -1,0 +1,40 @@
+const { Thoughts, User  } = require('../models');
+
+module.exports = {
+  getThoughts(req, res) {
+    Thoughts.find()
+      .then((thought) => res.json(thought))
+      .catch((err) => res.status(500).json(err));
+  },
+  // Get a single comment
+  getSingleThought(req, res) {
+    Thoughts.findOne({ _id: req.params.thoughtId })
+      .then((thought) =>
+        !thought
+          ? res.status(404).json({ message: 'No thought found with that id' })
+          : res.json(thought)
+      )
+      .catch((err) => res.status(500).json(err));
+  },
+  // Create a comment
+  createThought(req, res) {
+    Thoughts.create(req.body)
+      .then((thought) => {
+        return User.findOneAndUpdate(
+          { _id: req.body.userId },
+          { $push: { thoughts: thought._id } },
+          { new: true }
+        );
+      })
+      .then((user) =>
+        !user
+          ? res
+              .status(404)
+              .json({ message: 'Thought created, but no user with this ID' })
+          : res.json({ message: 'Thought created' })
+      )
+      .catch((err) => {
+        console.error(err);
+      });
+  },
+};
