@@ -2,7 +2,7 @@ const { Schema, model } = require('mongoose');
 const { stringify } = require('querystring');
 
 const userSchema = new Schema({
-    title: { type: String, 
+    username: { type: String, 
         required: true,
         unique: true,
         trim: true },
